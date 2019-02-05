@@ -46,3 +46,20 @@ import ut;
     fun(Bar("bar"), Foo("foo"), Baz("quux")).should == 10;
     fun(Baz(), Bar(), Foo()).should == 0;
 }
+
+
+@("defaults")
+@safe pure unittest {
+
+    static struct Foo { string value; }
+    static struct Bar { string value; }
+    static struct Baz { string value; }
+
+    static size_t funImpl(in Foo foo, in Bar bar = Bar("lebar"), in Baz baz = Baz("lebaz")) {
+        return foo.value.length + bar.value.length + baz.value.length;
+    }
+
+    alias fun = kwargify!funImpl;
+
+    fun(Foo()).should == 10;
+}

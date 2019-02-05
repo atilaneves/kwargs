@@ -7,26 +7,39 @@ module kwargs;
  */
 template kwargify(alias Function) {
 
-    import std.traits: Parameters;
-
     auto impl(A...)(auto ref A args) {
         import std.conv: text;
         import std.typecons: Tuple;
-        import std.meta: staticMap, staticIndexOf;
-        import std.traits: Unqual;
+        import std.meta: staticMap, staticIndexOf, Filter, templateNot;
+        import std.traits: Unqual, ParameterDefaults, Parameters;
 
-        static assert(A.length == Parameters!Function.length,
+        enum isDefaultParam(T...) = is(T[0] == void);
+        enum numOfNonDefaultParams = Filter!(templateNot!isDefaultParam, ParameterDefaults!Function).length;
+        enum numOfRequiredParams = Parameters!Function.length - numOfNonDefaultParams;
+
+        pragma(msg, "non defaults: ", numOfNonDefaultParams);
+        pragma(msg, "required: ", numOfRequiredParams);
+
+        static assert(A.length >= numOfRequiredParams,
                       text("ERROR: wrapper for ", __traits(identifier, Function),
-                           "must be called with ", Parameters!Function.length, " parameters"));
+                           "must be called with at least", Parameters!Function.length, " parameters"));
 
         Tuple!(staticMap!(Unqual, Parameters!Function)) params;
 
         static foreach(i; 0 .. Parameters!Function.length) {{
+
             alias Type = typeof(params[i]);
+
+            enum hasDefaultValue = !is(ParameterDefaults!Function[i] == void);
             enum typeIndex = staticIndexOf!(Type, A);
-            static assert(typeIndex != -1,
-                          text("Could not find `", Type.stringof, "` in call to ", __traits(identifer, Function)));
-            params[i] = args[typeIndex];
+
+            static if(typeIndex == -1) {
+                static assert(hasDefaultValue,
+                              text("Could not find `", Type.stringof, "` in call to ", __traits(identifier, Function)));
+                params[i] = ParameterDefaults!Function[i];
+            }
+            else
+                params[i] = args[typeIndex];
         }}
 
         auto call() {
