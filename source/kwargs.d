@@ -17,10 +17,6 @@ template kwargify(alias Function) {
         enum numOfNonDefaultParams = Filter!(templateNot!isDefaultParam, ParameterDefaults!Function).length;
         enum numOfRequiredParams = Parameters!Function.length - numOfNonDefaultParams;
 
-        static assert(A.length >= numOfRequiredParams,
-                      text("ERROR: wrapper for ", __traits(identifier, Function),
-                           "must be called with at least", Parameters!Function.length, " parameters"));
-
         alias funcArgTypes = staticMap!(Unqual, Parameters!Function);
         enum isWrongType(T) = staticIndexOf!(T, funcArgTypes) == -1;
         alias wrongTypes = Filter!(isWrongType, A);
