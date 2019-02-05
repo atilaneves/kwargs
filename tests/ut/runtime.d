@@ -4,7 +4,6 @@ module ut.runtime;
 import ut;
 
 
-@ShouldFail
 @("nodefaults")
 @safe pure unittest {
 
