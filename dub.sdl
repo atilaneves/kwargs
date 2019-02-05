@@ -1,0 +1,26 @@
+name "kwargs"
+description "Strongly typed keyword arguments"
+authors "Atila Neves"
+copyright "Copyright © 2019, Atila Neves"
+license "BSD 3-clause"
+
+targetType "library"
+targetPath "bin"
+
+dflags "-dip25" "-dip1000" "-dip1008"
+
+configuration "library" {
+
+}
+
+
+configuration "unittest" {
+    targetType "executable"
+    targetName "ut"
+
+    sourcePaths "tests"
+    importPaths "tests"
+    mainSourceFile "tests/main.d"
+
+    dependency "unit-threaded" version="*"
+}
