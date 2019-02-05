@@ -68,4 +68,5 @@ import ut;
     static assert(!__traits(compiles, fun()));
     static assert(!__traits(compiles, fun(Bar())));
     static assert(!__traits(compiles, fun(Foo(), 3)));
+    static assert(!__traits(compiles, fun(Foo(), Bar(), Bar())));
 }
