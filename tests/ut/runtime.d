@@ -4,6 +4,7 @@ module ut.runtime;
 import ut;
 
 
+@ShouldFail
 @("nodefaults")
 @safe pure unittest {
 
@@ -22,4 +23,8 @@ import ut;
     fun(Foo("foo"), Bar("bar"), Baz("baz"));
     fun(Bar("bar"), Foo("foo"), Baz("baz"));
     fun(Baz("baz"), Bar("bar"), Foo("foo"));
+
+    static assert(!__traits(compiles, fun()));
+
+    fun(Foo(), Bar(), Baz()).shouldThrow!UnitTestException;
 }
