@@ -21,7 +21,14 @@ template kwargify(alias Function) {
                       text("ERROR: wrapper for ", __traits(identifier, Function),
                            "must be called with at least", Parameters!Function.length, " parameters"));
 
-        Tuple!(staticMap!(Unqual, Parameters!Function)) params;
+        alias funcArgTypes = staticMap!(Unqual, Parameters!Function);
+        enum isWrongType(T) = staticIndexOf!(T, funcArgTypes) == -1;
+        alias wrongTypes = Filter!(isWrongType, A);
+
+        static assert(wrongTypes.length == 0,
+                      text("ERROR: ", wrongTypes.stringof, " are not parameters of ", __traits(identifier, Function)));
+
+        Tuple!funcArgTypes params;
 
         static foreach(i; 0 .. Parameters!Function.length) {{
 
