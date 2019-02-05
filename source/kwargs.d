@@ -17,9 +17,6 @@ template kwargify(alias Function) {
         enum numOfNonDefaultParams = Filter!(templateNot!isDefaultParam, ParameterDefaults!Function).length;
         enum numOfRequiredParams = Parameters!Function.length - numOfNonDefaultParams;
 
-        pragma(msg, "non defaults: ", numOfNonDefaultParams);
-        pragma(msg, "required: ", numOfRequiredParams);
-
         static assert(A.length >= numOfRequiredParams,
                       text("ERROR: wrapper for ", __traits(identifier, Function),
                            "must be called with at least", Parameters!Function.length, " parameters"));
@@ -42,6 +39,7 @@ template kwargify(alias Function) {
                 params[i] = args[typeIndex];
         }}
 
+        // to avoid a static if on the return type
         auto call() {
             return Function(params.expand);
         }
