@@ -41,8 +41,7 @@ template kwargify(alias Function) {
                 static assert(hasDefaultValue,
                               text("Could not find `", Type.stringof, "` in call to ", __traits(identifier, Function)));
                 params[i] = ParameterDefaults!Function[i];
-            }
-            else
+            } else
                 params[i] = args[typeIndex];
         }}
 
