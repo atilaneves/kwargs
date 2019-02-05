@@ -29,11 +29,11 @@ template kwargify(alias Function) {
             params[i] = args[typeIndex];
         }}
 
-        auto doRet() {
+        auto call() {
             return Function(params.expand);
         }
 
-        return doRet;
+        return call;
     }
 
     alias kwargify = impl;
