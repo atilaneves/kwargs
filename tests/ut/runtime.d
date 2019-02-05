@@ -62,4 +62,9 @@ import ut;
     alias fun = kwargify!funImpl;
 
     fun(Foo()).should == 10;
+    fun(Bar("b"), Foo("fo")).should == 8;
+    fun(Bar("b"), Baz("ba"), Foo("foo")).should == 6;
+
+    static assert(!__traits(compiles, fun()));
+    static assert(!__traits(compiles, fun(Bar())));
 }
