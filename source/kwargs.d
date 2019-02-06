@@ -7,6 +7,24 @@ module kwargs;
  */
 template kwargify(alias Function) {
 
+    import std.traits: Parameters;
+    import std.conv: text;
+
+    // Workaround for https://issues.dlang.org/show_bug.cgi?id=19650
+    private size_t numTypes(T, A...)() {
+        size_t ret;
+        static foreach(i; 0 .. A.length)
+            static if(is(A[i] == T))
+                ++ret;
+        return ret;
+    }
+
+    static foreach(T; Parameters!Function) {
+        static assert(numTypes!(T, Parameters!Function) == 1,
+                      text("ERROR: `", __traits(identifier, Function), "` does not have unique types: ",
+                           Parameters!Function.stringof));
+    }
+
     auto impl(A...)(auto ref A args) {
         import std.conv: text;
         import std.typecons: Tuple;
@@ -19,15 +37,6 @@ template kwargify(alias Function) {
 
         static assert(wrongTypes.length == 0,
                       text("ERROR: ", wrongTypes.stringof, " are not parameters of ", __traits(identifier, Function)));
-
-        // Workaround for https://issues.dlang.org/show_bug.cgi?id=19650
-        size_t numTypes(T)() {
-            size_t ret;
-            static foreach(i; 0 .. A.length)
-                static if(is(A[i] == T))
-                    ++ret;
-            return ret;
-        }
 
         // the parameters to pass to the wrapped function
         Tuple!funcArgTypes params;
@@ -44,8 +53,9 @@ template kwargify(alias Function) {
                               text("Could not find `", Type.stringof, "` in call to ", __traits(identifier, Function)));
                 params[i] = ParameterDefaults!Function[i];
             } else {
-                static assert(numTypes!Type == 1,
-                              text("ERROR: found ", numTypes!Type, " `", Type.stringof, "`s instead of 1"));
+                enum numTypes = numTypes!(Type, A);
+                static assert(numTypes == 1,
+                              text("ERROR: found ", numTypes, " `", Type.stringof, "`s instead of 1"));
                 params[i] = args[typeIndex];
             }
         }}

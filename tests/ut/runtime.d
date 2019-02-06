@@ -70,3 +70,13 @@ import ut;
     static assert(!__traits(compiles, fun(Foo(), 3)));
     static assert(!__traits(compiles, fun(Foo(), Bar(), Bar())));
 }
+
+
+@("unique")
+@safe pure unittest {
+    // won't allow wrapping a function with repeated types
+
+    static void fun(string, string) {}
+
+    static assert(!__traits(compiles, kwargify!fun));
+}
