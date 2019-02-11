@@ -5,7 +5,7 @@ module kwargs.runtime;
    Wrap `Function` so that it's callable with its parameters in any order.
    No types should be repeated in its signature.
  */
-template kwargify(alias Function) {
+template kwargify(alias Function) if(!__traits(isTemplate, Function)) {
 
     import std.traits: Parameters;
     import std.conv: text;
