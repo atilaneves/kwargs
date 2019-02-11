@@ -2,7 +2,6 @@
 
 
 [![Build Status](https://travis-ci.org/atilaneves/kwargs.png?branch=master)](https://travis-ci.org/atilaneves/kwargs)
-[![Coverage](https://codecov.io/gh/atilaneves/kwargs/branch/master/graph/badge.svg)](https://codecov.io/gh/atilaneves/kwargs)
 
 
 ## Pass run or compile time parameters in any order to your functions
