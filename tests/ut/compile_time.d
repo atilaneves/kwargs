@@ -27,4 +27,6 @@ import ut;
     static assert(!__traits(compiles, fun!()));
     static assert(!__traits(compiles, fun!(Bar(2))));
     static assert(!__traits(compiles, fun!(Baz(2))));
+    static assert(!__traits(compiles, fun!(Foo(2), Bar(9), Bar(9))));
+    static assert(!__traits(compiles, fun!(Foo(2), Bar(9), 42)));
 }

@@ -37,14 +37,21 @@ template kwargify(alias Function, Parameters...)
     static assert(required.length + optional.length == Parameters.length);
 
     auto impl(Args...)() {
-        import std.meta: AliasSeq, staticMap, staticIndexOf;
+        import std.meta: AliasSeq, staticMap, staticIndexOf, allSatisfy;
+        import std.conv: text;
+
+        alias Type(alias T) = T.Type;
+        alias ParamTypes = staticMap!(Type, Parameters);
+
+        enum isParameter(alias T) = staticIndexOf!(typeof(T), ParamTypes) != -1;
+
+        static assert(allSatisfy!(isParameter, Args),
+                      text("All of `", Args.stringof, "` must be members of `", ParamTypes.stringof, "`"));
 
         // return a tuple of values to use as template parameters to `Function`
         static auto params() {
             import std.typecons: Tuple;
-            import std.conv: text;
 
-            alias Type(alias T) = T.Type;
             alias TupleType = Tuple!(staticMap!(Type, Parameters));
 
             TupleType ret;
