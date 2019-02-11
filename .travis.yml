@@ -1,0 +1,17 @@
+language: d
+sudo: false
+
+
+matrix:
+  include:
+    - d: dmd-2.084.1
+    - d: ldc-1.13.0
+
+
+script:
+  - dub test --build=unittest-cov --compiler=${DC}
+  - dub build --compiler=${DC}
+
+
+after_success:
+ - bash <(curl -s https://codecov.io/bash)
