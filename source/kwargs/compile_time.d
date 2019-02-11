@@ -42,6 +42,7 @@ template kwargify(alias Function, Parameters...)
         // return a tuple of values to use as template parameters to `Function`
         static auto params() {
             import std.typecons: Tuple;
+            import std.conv: text;
 
             alias Type(alias T) = T.Type;
             alias TupleType = Tuple!(staticMap!(Type, Parameters));
@@ -50,20 +51,21 @@ template kwargify(alias Function, Parameters...)
 
             // required parameters are easy
             static foreach(i, req; required) {{
-                enum argIndex = staticIndexOf!(req.Type, required);
-                ret[i] = Args[i];
+                alias ofRightType = Filter!(isParamType!req, Args);
+                static assert(ofRightType.length == 1);
+                ret[i] = ofRightType[0];
             }}
 
             // optional parameters are trickier
             static foreach(i, opt; optional) {{
 
-                alias ofRightType = Filter!(isOptionalType!opt, Args);
+                alias ofRightType = Filter!(isParamType!opt, Args);
 
                 static if(ofRightType.length == 0) {
                     // Get the default value from `Parameters` if the user didn't
                     // supply one of the optional values
 
-                    alias defaults = Filter!(isOptionalType!opt, Parameters);
+                    alias defaults = Filter!(isParamType!opt, Parameters);
                     static assert(defaults.length == 1);
                     ret[required.length + i] = defaults[0].value;
                 } else {
@@ -85,7 +87,7 @@ template kwargify(alias Function, Parameters...)
 
 
 // Workaround for https://issues.dlang.org/show_bug.cgi?id=19650
-private template isOptionalType(alias optional) {
+private template isParamType(alias param) {
 
     private template Type(alias T) {
         static if(is(T.Type))
@@ -94,5 +96,5 @@ private template isOptionalType(alias optional) {
             alias Type = typeof(T);
     }
 
-    enum isOptionalType(alias T) = is(Type!T == optional.Type);
+    enum isParamType(alias T) = is(Type!T == param.Type);
 }
