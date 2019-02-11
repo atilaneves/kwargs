@@ -31,7 +31,7 @@ With this library, one can:
 import kwargs;
 alias awesomeBuild = kwargify!build;
 // look ma, wrong order!
-awesomeBuild(ExtraStuff(42), BinName("myapp"))
+awesomeBuild(ExtraStuff(42), BinName("myapp"));
 ```
 
 
