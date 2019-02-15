@@ -15,7 +15,7 @@ without having to spell out all the values to be used, especially when many of t
 void build(BinName binName,
            CompileFlags cFlags = CompileFlags("-g", "-debug"),
            LinkerFlags lFlags = LinkerFlags(),
-           ExtraStuff extraStuff = ExtraStuff());_
+           ExtraStuff extraStuff = ExtraStuff());
 ```
 
 If the user wants to use a non-default `ExtraStuff` value, they have to pass in `CompilerFlags` _and_ `LinkerFlags` even though
