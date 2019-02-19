@@ -80,3 +80,20 @@ import ut;
 
     static assert(!__traits(compiles, kwargify!fun));
 }
+
+
+@("nocopy")
+@safe pure unittest {
+
+    static struct Foo {
+        int[1024] ints;
+        @disable this(this);
+    }
+
+    void funImpl(Foo foo) {}
+    funImpl(Foo());
+
+    alias fun = kwargify!funImpl;
+
+    fun(Foo());
+}
