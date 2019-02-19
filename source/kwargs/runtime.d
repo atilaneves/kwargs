@@ -38,8 +38,10 @@ template kwargify(alias Function) if(!__traits(isTemplate, Function)) {
         static assert(wrongTypes.length == 0,
                       text("ERROR: ", wrongTypes.stringof, " are not parameters of ", __traits(identifier, Function)));
 
-        auto nthParam(int index)() {
-            alias Type = typeof(params[index]);
+        auto ref nthParam(int index)() {
+            import std.functional: forward;
+
+            alias Type = funcArgTypes[index];
 
             enum hasDefaultValue = !is(ParameterDefaults!Function[index] == void);
             enum typeIndex = staticIndexOf!(Type, A);
@@ -52,21 +54,29 @@ template kwargify(alias Function) if(!__traits(isTemplate, Function)) {
                 enum numTypes = numTypes!(Type, A);
                 static assert(numTypes == 1,
                               text("ERROR: found ", numTypes, " `", Type.stringof, "`s instead of 1"));
-                return args[typeIndex];
+                return forward!(args[typeIndex]);
             }
         }
 
-        // the parameters to pass to the wrapped function
-        Tuple!funcArgTypes params;
-
-        static foreach(i; 0 .. Parameters!Function.length) {
-            params[i] = nthParam!i;
-        }
-
-
         // to avoid a static if on the return type
         auto call() {
-            return Function(params.expand);
+
+            static string callMixinStr() {
+                import std.range: iota;
+                import std.array: join;
+                import std.algorithm: map;
+                import std.conv: text;
+
+                auto params = Parameters!Function.length
+                    .iota
+                    .map!(i => text(`nthParam!`, i))
+                    .join(`, `);
+
+                return `return Function(` ~ params ~ `);`;
+            }
+
+            enum str = callMixinStr;
+            mixin(str);
         }
 
         return call;
